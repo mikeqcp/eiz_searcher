@@ -65,8 +65,9 @@ namespace Search_engine
             }
             catch (Exception e)
             {
-                throw e;
+                //throw e;
             }
+            return Documents;
         }
 
         public List<string> LoadKeywords()
@@ -81,12 +82,13 @@ namespace Search_engine
                         Keywords.Add(line);
                 }
                 _loaded[(int)RequiredFiles.Keywords] = true;
-                return Keywords;
+                
             }
             catch (Exception e)
             {
-                throw e;
+                //throw e;
             }
+            return Keywords;
         }
 
         private string ChooseFile()

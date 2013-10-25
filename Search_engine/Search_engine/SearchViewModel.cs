@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Caliburn.Micro;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Search_engine
 {
@@ -19,6 +20,17 @@ namespace Search_engine
         public void LoadWords()
         {
             _ds.LoadKeywords();
+        }
+
+        public void Search(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                if (!_ds.IsReady)
+                    MessageBox.Show("You need to load documents and keywords first!");
+
+                Console.Write("s");
+            }
         }
 
         public void Quit()

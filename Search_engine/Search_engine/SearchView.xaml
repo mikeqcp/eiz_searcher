@@ -1,6 +1,7 @@
 ﻿<Window x:Class="Search_engine.SearchView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cal="http://www.caliburnproject.org"
         Title="SearchView" Height="403" Width="571">
     <DockPanel>
         <Menu DockPanel.Dock="Top" Height="20">
@@ -12,7 +13,7 @@
             
         </Menu>
         <DockPanel>
-            <TextBox DockPanel.Dock="Top" Height="20"></TextBox>
+            <TextBox DockPanel.Dock="Top" Height="20" Name="SearchInput" cal:Message.Attach="[Event KeyDown] = [Action Search(null, $eventArgs)]"></TextBox>
             <ListView></ListView>
         </DockPanel>
     </DockPanel>
