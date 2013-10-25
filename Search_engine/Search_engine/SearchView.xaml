@@ -1,0 +1,19 @@
+﻿<Window x:Class="Search_engine.SearchView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SearchView" Height="403" Width="571">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Height="20">
+            <MenuItem Header="File">
+                <MenuItem Name="LoadDocs" Header="Load Documents"/>
+                <MenuItem Name="LoadWords" Header="Load Keywords"/>
+                <MenuItem Name="Quit" Header="Quit"/>
+            </MenuItem>
+            
+        </Menu>
+        <DockPanel>
+            <TextBox DockPanel.Dock="Top" Height="20"></TextBox>
+            <ListView></ListView>
+        </DockPanel>
+    </DockPanel>
+</Window>
