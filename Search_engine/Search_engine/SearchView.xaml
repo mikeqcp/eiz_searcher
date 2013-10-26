@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:cal="http://www.caliburnproject.org"
         Title="SearchView" Height="403" Width="571">
+
     <DockPanel>
         <Menu DockPanel.Dock="Top" Height="20">
             <MenuItem Header="File">
@@ -13,8 +14,18 @@
             
         </Menu>
         <DockPanel>
-            <TextBox DockPanel.Dock="Top" Height="20" Name="SearchInput" cal:Message.Attach="[Event KeyDown] = [Action Search(null, $eventArgs)]"></TextBox>
-            <ListView></ListView>
+            <TextBox DockPanel.Dock="Top" Height="20" Name="SearchQuery" cal:Message.Attach="[Event KeyDown] = [Action Search(null, $eventArgs)]"></TextBox>
+            <ListView Name="Results">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Path=Document.Title}" />
+                            <TextBlock Text="{Binding Path=Document.Content}"/>
+                            <TextBlock Text="{Binding Path=RankValue}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </DockPanel>
     </DockPanel>
 </Window>

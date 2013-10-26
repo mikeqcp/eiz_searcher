@@ -4,15 +4,17 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Microsoft.Win32;
+using PorterStemmerAlgorithm;
 
 namespace Search_engine
 {
-    class DataSource
+    public class DataSource
     {
         private enum RequiredFiles {Documents, Keywords};
 
         public List<Document> Documents { get; private set; }
         public List<string> Keywords { get; private set; }
+        public List<string> KeywordsStemmed { get; private set; }
         public bool IsReady
         {
             get
@@ -63,10 +65,7 @@ namespace Search_engine
                 _loaded[(int)RequiredFiles.Documents] = true;
                 return Documents;
             }
-            catch (Exception e)
-            {
-                //throw e;
-            }
+            catch (Exception){}
             return Documents;
         }
 
@@ -84,11 +83,22 @@ namespace Search_engine
                 _loaded[(int)RequiredFiles.Keywords] = true;
                 
             }
-            catch (Exception e)
-            {
-                //throw e;
-            }
+            catch (Exception) {}
+
+            KeywordsStemmed = StemKeywords(Keywords);
             return Keywords;
+        }
+
+        private List<string> StemKeywords(List<string> list)
+        {
+            var stemmed = new List<string>();
+            StemmerInterface stemmer = new PorterStemmer();
+            foreach (var t in list)
+            {
+                stemmed.Add(stemmer.stemTerm(t));
+            }
+
+            return stemmed;
         }
 
         private string ChooseFile()
