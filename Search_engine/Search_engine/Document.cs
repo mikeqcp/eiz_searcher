@@ -11,6 +11,18 @@ namespace Search_engine
     {
         public string Title { get; set; }
         public string Content { get; set; }
+        public string RawContent
+        {
+            get
+            {
+                string rawContent = "";
+                foreach (var s in _bagOdWordsStemmed)
+                {
+                    rawContent += s + " ";
+                }
+                return rawContent;
+            }
+        }
         public List<string> BagOfWords
         {
             get
