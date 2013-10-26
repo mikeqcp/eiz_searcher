@@ -29,12 +29,16 @@ namespace Search_engine
 
         public void Search(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Return)
+            if (e.Key == Key.Return && !string.IsNullOrEmpty(SearchQuery))
             {
+                if (!_ds.IsReady)
+                {
+                    MessageBox.Show("You need to load documents and keywords first!");
+                    return;
+                }
+
                 var query = new Query(SearchQuery);
                 _ranker = new Ranker(_ds, query);
-                if (!_ds.IsReady)
-                    MessageBox.Show("You need to load documents and keywords first!");
 
                 Results = new ObservableCollection<ResultItem>(_ranker.RankOrder);
                 NotifyOfPropertyChange(() => Results);
