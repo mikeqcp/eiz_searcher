@@ -101,7 +101,7 @@ namespace Search_engine
             CalculateTF();
             CalculateIDF();
             _rankValues = CalculateRankValues();
-            return _rankValues.OrderByDescending(r => r).Select(r => new ResultItem() { Document=_documents[Array.IndexOf(_rankValues, r)], RankValue = r}).ToList();
+            return _rankValues.Where(r => r>0).OrderByDescending(r => r).Select(r => new ResultItem() { Document=_documents[Array.IndexOf(_rankValues, r)], RankValue = r}).ToList();
         }
 
         private double[] CalculateRankValues()

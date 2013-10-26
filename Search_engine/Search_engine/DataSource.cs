@@ -46,6 +46,7 @@ namespace Search_engine
             {
                 using (StreamReader sr = new StreamReader(filename))
                 {
+                    Documents.Clear();
                     while ((line = sr.ReadLine()) != null)
                     {
                         if (line == string.Empty)
@@ -77,6 +78,7 @@ namespace Search_engine
             {
                 using (StreamReader sr = new StreamReader(filename))
                 {
+                    Keywords.Clear();
                     while ((line = sr.ReadLine()) != null)
                         Keywords.Add(line);
                 }
