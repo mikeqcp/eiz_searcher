@@ -45,19 +45,18 @@ namespace Search_engine
         {
             get
             {
-                return Title + Content;
+                return Title + " " + Content;
             }
         }
 
         private List<string> GetWords()
         {
-            var splitted = ContentAll.Split();
+            var splitted = ContentAll.Split(' ', '.', ',', ':', ';');
             var cleanList = new List<string>();
             foreach (var w in splitted)
             {
-                var corrected = w.Trim();
                 Regex rgx = new Regex(@"[\\\-~!@#$%^\*()_+{}:;|',\./[\]]");
-                var clean = rgx.Replace(corrected, "");
+                var clean = rgx.Replace(w, " ").Trim();
                 if(!string.IsNullOrEmpty(clean))
                     cleanList.Add(clean.ToLower());
             }
