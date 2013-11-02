@@ -15,6 +15,9 @@
                 <MenuItem Name="LoadWords" Header="Load Keywords"/>
                 <MenuItem Name="Quit" Header="Quit"/>
             </MenuItem>
+            <MenuItem Header="Options">
+                <CheckBox Name="UseStemming">Use stemming</CheckBox>
+            </MenuItem>
             
         </Menu>
         <DockPanel Name="Root">

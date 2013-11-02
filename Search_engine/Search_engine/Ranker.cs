@@ -9,6 +9,7 @@ namespace Search_engine
     {
         private List<Document> _documents;
         private List<string> _keywords;
+        private bool _useStemming;
 
         private double[] _queryTFVector;
         private double[] _queryTFIDFVector;
@@ -27,10 +28,11 @@ namespace Search_engine
             }
         }
 
-        public Ranker(DataSource data, Query query)
+        public Ranker(DataSource data, Query query, bool useStemming)
         {
             _documents = data.Documents;
-            _keywords = data.KeywordsStemmed;
+            _keywords = data.Keywords;
+            _useStemming = useStemming;
 
             int docCount = _documents.Count;
             int wordsCount = _keywords.Count;
@@ -49,7 +51,7 @@ namespace Search_engine
                 var maxCount = 1;
                 for (int j = 0; j < _keywords.Count; j++)
                 {
-                    var count = doc.CountOccurrences(_keywords[j]);
+                    var count = doc.CountOccurrences(_keywords[j], _useStemming);
                     _TFvalues[j, i] = count;
                     maxCount = count > maxCount ? count : maxCount;
                 }
@@ -78,11 +80,12 @@ namespace Search_engine
         private double CountIDFForTerm(int termIndex)
         {
             int allDocsCount = _documents.Count;
-            int termCount = 1;
+            int termCount = 0;
             for (int i = 0; i < allDocsCount; i++)
             {
-                termCount += _TFvalues[termIndex, i] == 1 ? 1 : 0;
+                termCount += _TFvalues[termIndex, i] > 0 ? 1 : 0;
             }
+            if (termCount == 0) termCount = 1;
             return Math.Log((double)allDocsCount / termCount);
         }
 
@@ -101,7 +104,7 @@ namespace Search_engine
             CalculateTF();
             CalculateIDF();
             _rankValues = CalculateRankValues();
-            return _rankValues.Where(r => r>0).OrderByDescending(r => r).Select(r => new ResultItem() { Document=_documents[Array.IndexOf(_rankValues, r)], RankValue = r}).ToList();
+            return _rankValues.OrderByDescending(r => r).Select(r => new ResultItem() { Document = _documents[Array.IndexOf(_rankValues, r)], RankValue = r }).ToList();
         }
 
         private double[] CalculateRankValues()
@@ -110,7 +113,7 @@ namespace Search_engine
             for (int i = 0; i < _documents.Count; i++)
             {
                 var docVector = GetDocVector(i);
-                rankValues[i] = Vectors.GetSimilarity(docVector, _queryTFVector);
+                rankValues[i] = Vectors.GetSimilarity(docVector, _queryTFIDFVector);
             }
             return rankValues;
         }

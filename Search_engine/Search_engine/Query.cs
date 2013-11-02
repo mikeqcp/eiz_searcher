@@ -11,10 +11,12 @@ namespace Search_engine
     {
         private string _query;
         private List<string> _queryWords;
+        private bool _useStemming;
         PorterStemmer _stemmer = new PorterStemmer();
 
-        public Query(string queryString)
+        public Query(string queryString, bool useStemming)
         {
+            _useStemming = useStemming;
             _query = queryString;
             _queryWords = SplitQuery();
         }
@@ -30,8 +32,9 @@ namespace Search_engine
                 var clean = rgx.Replace(corrected, "");
                 if (!string.IsNullOrEmpty(clean))
                 {
-                    var stemmed = _stemmer.stemTerm(clean.ToLower());
-                    cleanList.Add(stemmed);
+                    if(_useStemming)
+                        clean = _stemmer.stemTerm(clean);
+                    cleanList.Add(clean.ToLower());
                 }
             }
             return cleanList;

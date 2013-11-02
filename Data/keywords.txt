@@ -1,3 +1,4 @@
+machine
 access
 ai
 applied
@@ -116,6 +117,5 @@ information
 group
 research
 description
-machine
 school
 learning

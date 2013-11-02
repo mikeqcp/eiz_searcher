@@ -12,9 +12,9 @@ namespace Search_engine
     {
         private enum RequiredFiles {Documents, Keywords};
 
+        private string _keywordsFile;
         public List<Document> Documents { get; private set; }
         public List<string> Keywords { get; private set; }
-        public List<string> KeywordsStemmed { get; private set; }
         public bool IsReady
         {
             get
@@ -61,7 +61,8 @@ namespace Search_engine
                             else
                                 content += line;
                         }
-                    }  
+                    }
+                    Documents.Add(new Document { Title = title, Content = content });
                 }
                 _loaded[(int)RequiredFiles.Documents] = true;
                 return Documents;
@@ -70,13 +71,14 @@ namespace Search_engine
             return Documents;
         }
 
-        public List<string> LoadKeywords()
+        public List<string> LoadKeywords(bool useStemming = true)
         {
-            string filename = ChooseFile();
+            if(_keywordsFile == null)
+                _keywordsFile = ChooseFile();
             string line;
             try
             {
-                using (StreamReader sr = new StreamReader(filename))
+                using (StreamReader sr = new StreamReader(_keywordsFile))
                 {
                     Keywords.Clear();
                     while ((line = sr.ReadLine()) != null)
@@ -87,8 +89,10 @@ namespace Search_engine
             }
             catch (Exception) {}
 
-            KeywordsStemmed = StemKeywords(Keywords);
-            return Keywords;
+            if(useStemming)
+                Keywords = StemKeywords(Keywords);
+
+            return Keywords.Distinct().ToList();
         }
 
         private List<string> StemKeywords(List<string> list)

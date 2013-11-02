@@ -20,21 +20,19 @@ namespace Search_engine
 
         private static double GetLength(double[] vec)
         {
-            var sum = vec.Sum(v => v*10);
+            var sum = vec.Sum(v => v*v);
             return Math.Sqrt(sum);
         }
 
         private static double VecProduct(double[] v1, double[] v2)
         {
             double sum = 0;
-
             if (v1.Length != v2.Length) throw new Exception("Lengths not equal.");
 
             for (int i = 0; i < v1.Length; i++)
             {
                 sum += v1[i] * v2[i];
             }
-
             return sum;
         }
     }

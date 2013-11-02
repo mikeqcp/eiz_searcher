@@ -16,7 +16,8 @@ namespace Search_engine
             get
             {
                 string rawContent = "";
-                foreach (var s in _bagOdWordsStemmed)
+                var source = _bagOdWordsStemmed != null ? _bagOdWordsStemmed : BagOfWords;
+                foreach (var s in source)
                 {
                     rawContent += s + " ";
                 }
@@ -51,12 +52,13 @@ namespace Search_engine
 
         private List<string> GetWords()
         {
-            var splitted = ContentAll.Split(' ', '.', ',', ':', ';');
+            Regex rgx = new Regex(@"[^a-zA-Z]");
+            var cleared = rgx.Replace(ContentAll, " ");
+            var splitted = cleared.Split(' ', '.', ',', ':', ';');
             var cleanList = new List<string>();
             foreach (var w in splitted)
             {
-                Regex rgx = new Regex(@"[\\\-~!@#$%^\*()_+{}:;|',\./[\]]");
-                var clean = rgx.Replace(w, " ").Trim();
+                var clean = w.Trim();
                 if(!string.IsNullOrEmpty(clean))
                     cleanList.Add(clean.ToLower());
             }
@@ -74,9 +76,10 @@ namespace Search_engine
             return words;
         }
 
-        public bool Contains(string searched)
+        private bool Contains(string searched, bool useStemming = true)
         {
-            foreach (var w in BagOfWordsStemmed)
+            var source = useStemming ? BagOfWordsStemmed : BagOfWords;
+            foreach (var w in source)
             {
                 if (w.Equals(searched))
                     return true;
@@ -84,10 +87,11 @@ namespace Search_engine
             return false;
         }
 
-        public int CountOccurrences(string searched)
+        public int CountOccurrences(string searched, bool useStemming = true)
         {
             int count = 0;
-            foreach (var w in BagOfWordsStemmed)
+            var source = useStemming ? BagOfWordsStemmed : BagOfWords;
+            foreach (var w in source)
             {
                 if (w.Equals(searched))
                     count++;

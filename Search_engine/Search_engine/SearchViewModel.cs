@@ -14,6 +14,23 @@ namespace Search_engine
         private DataSource _ds = new DataSource();
         private Ranker _ranker;
         public string SearchQuery { get; set; }
+        private bool _keywordsLoaded = false;
+
+        private bool _useStemming;
+        public bool UseStemming
+        {
+            get 
+            {
+                return _useStemming;
+            }
+            set 
+            { 
+                _useStemming = value;
+                if(_keywordsLoaded)
+                    _ds.LoadKeywords(_useStemming);
+                NotifyOfPropertyChange(() => UseStemming);
+            }
+        }
         public ObservableCollection<ResultItem> Results { get; set; }
 
 
@@ -24,7 +41,7 @@ namespace Search_engine
 
         public void LoadWords()
         {
-            _ds.LoadKeywords();
+            _ds.LoadKeywords(_useStemming);
         }
 
         public void Search(object sender, KeyEventArgs e)
@@ -37,8 +54,8 @@ namespace Search_engine
                     return;
                 }
 
-                var query = new Query(SearchQuery);
-                _ranker = new Ranker(_ds, query);
+                var query = new Query(SearchQuery, _useStemming);
+                _ranker = new Ranker(_ds, query, _useStemming);
 
                 Results = new ObservableCollection<ResultItem>(_ranker.RankOrder);
                 NotifyOfPropertyChange(() => Results);
