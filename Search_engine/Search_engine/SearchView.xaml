@@ -22,6 +22,7 @@
         </Menu>
         <DockPanel Name="Root">
             <TextBox DockPanel.Dock="Top" Height="23" Name="SearchQuery" cal:Message.Attach="[Event KeyDown] = [Action Search(null, $eventArgs)]"></TextBox>
+            <ComboBox DockPanel.Dock="Top" Height="23" Name="SearchQueryHelp" cal:Message.Attach="[Event SelectionChanged] = [Action Search($this, null)]"></ComboBox>
             <ScrollViewer >
                 <ListView Name="Results"  HorizontalContentAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                     <ListView.ItemTemplate>

@@ -59,6 +59,18 @@ namespace Search_engine
             return tf;
         }
 
+        public double[] CountQueryTFnotNormalized(List<string> keywords)
+        {
+            double[] tf = new double[keywords.Count];
+            for (int j = 0; j < keywords.Count; j++)
+            {
+                var count = CountOccurrences(keywords[j]);
+                tf[j] = count;
+            }
+
+            return tf;
+        }
+
 
         private int CountOccurrences(string term)
         {

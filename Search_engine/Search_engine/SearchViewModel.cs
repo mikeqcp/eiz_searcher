@@ -14,6 +14,7 @@ namespace Search_engine
         private DataSource _ds = new DataSource();
         private Ranker _ranker;
         public string SearchQuery { get; set; }
+        public ObservableCollection<string> SearchQueryHelp { get; set; }
         private bool _keywordsLoaded = false;
 
         private bool _useStemming;
@@ -46,20 +47,32 @@ namespace Search_engine
 
         public void Search(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Return && !string.IsNullOrEmpty(SearchQuery))
+            string querySender = sender as string;
+            if (querySender != null && e == null && !string.IsNullOrEmpty(querySender))
             {
-                if (!_ds.IsReady)
-                {
-                    MessageBox.Show("You need to load documents and keywords first!");
-                    return;
-                }
-
-                var query = new Query(SearchQuery, _useStemming);
-                _ranker = new Ranker(_ds, query, _useStemming);
-
-                Results = new ObservableCollection<ResultItem>(_ranker.RankOrder);
-                NotifyOfPropertyChange(() => Results);
+                Search(querySender);
             }
+            else if (e.Key == Key.Return && !string.IsNullOrEmpty(SearchQuery))
+            {
+                Search(SearchQuery);
+            }
+        }
+
+        public void Search(string queryString)
+        {
+            if (!_ds.IsReady)
+            {
+                MessageBox.Show("You need to load documents and keywords first!");
+                return;
+            }
+
+            var query = new Query(queryString, _useStemming);
+            _ranker = new Ranker(_ds, query, _useStemming);
+
+            Results = new ObservableCollection<ResultItem>(_ranker.RankOrder);
+            SearchQueryHelp = new ObservableCollection<string>(_ranker.QueryHelp);
+            NotifyOfPropertyChange(() => Results);
+            NotifyOfPropertyChange(() => SearchQueryHelp);
         }
 
         public void Quit()

@@ -12,11 +12,18 @@ namespace Search_engine
         private bool _useStemming;
 
         private double[] _queryTFVector;
+        private double[] _queryTFVectorNotNormalized;
         private double[] _queryTFIDFVector;
         private double[,] _TFvalues;
+        private double[,] _TFvaluesNotNormalized;
         private double[,] _TFIDFvalues;
         private double[] _rankValues;
         private List<ResultItem> _docOrder;
+        private List<string> _queryHelp;
+
+        private int _queryHelpersCount = 5;
+        private double _firstQueryDocumentsSplitPercentage = 0.05;
+        private double _queryDocumentsSplitPercentageDelta = 0.05;
 
         public List<ResultItem> RankOrder
         {
@@ -24,7 +31,16 @@ namespace Search_engine
             {
                 if (_docOrder == null)
                     _docOrder = CalculateRanks();
+                _queryHelp = GenerateHelpQueries();
                 return _docOrder;
+            }
+        }
+
+        public List<string> QueryHelp
+        {
+            get
+            {
+                return _queryHelp;
             }
         }
 
@@ -38,8 +54,10 @@ namespace Search_engine
             int wordsCount = _keywords.Count;
 
             _TFvalues = new double[wordsCount, docCount];
+            _TFvaluesNotNormalized = new double[wordsCount, docCount];
             _TFIDFvalues = new double[wordsCount, docCount];
             _queryTFVector = query.CountQueryTF(_keywords);
+            _queryTFVectorNotNormalized = query.CountQueryTFnotNormalized(_keywords);
             _queryTFIDFVector = new double[_queryTFVector.Length];
         }
 
@@ -53,6 +71,7 @@ namespace Search_engine
                 {
                     var count = doc.CountOccurrences(_keywords[j], _useStemming);
                     _TFvalues[j, i] = count;
+                    _TFvaluesNotNormalized[j, i] = count;
                     maxCount = count > maxCount ? count : maxCount;
                 }
 
@@ -104,7 +123,7 @@ namespace Search_engine
             CalculateTF();
             CalculateIDF();
             _rankValues = CalculateRankValues();
-            return _rankValues.OrderByDescending(r => r).Select(r => new ResultItem() { Document = _documents[Array.IndexOf(_rankValues, r)], RankValue = r }).ToList();
+            return _documents.Select(d => new ResultItem() { Document = d, RankValue = _rankValues[_documents.IndexOf(d)] }).OrderByDescending(d => d.RankValue).ToList();
         }
 
         private double[] CalculateRankValues()
@@ -116,6 +135,55 @@ namespace Search_engine
                 rankValues[i] = Vectors.GetSimilarity(docVector, _queryTFIDFVector);
             }
             return rankValues;
+        }
+
+        private List<string> GenerateHelpQueries()
+        {
+            List<string> allHelpQueries = new List<string>();
+            double documentPercentageSplit = _firstQueryDocumentsSplitPercentage;
+
+            for (int queryIndex = 0; queryIndex < _queryHelpersCount; queryIndex++)
+            {
+                double[] newQueryTFnotNormalized = new double[_keywords.Count];
+                _queryTFVectorNotNormalized.CopyTo(newQueryTFnotNormalized, 0);
+
+                int bestDocsCount = (int) (documentPercentageSplit * _documents.Count);
+                int worstDocsCount = _documents.Count - bestDocsCount;
+
+                for (int docIndex = 0; docIndex < _documents.Count; docIndex++)
+                {
+                    int indexOfDoc = _documents.IndexOf(_docOrder[docIndex].Document);
+
+                    for (int i = 0; i < newQueryTFnotNormalized.Length; i++)
+                    {
+                        if (docIndex < bestDocsCount)
+                        {
+                            newQueryTFnotNormalized[i] += 0.5 * _TFvaluesNotNormalized[i, indexOfDoc] / bestDocsCount;
+                        }
+                        else
+                        {
+                            newQueryTFnotNormalized[i] -= 0.25 * _TFvaluesNotNormalized[i, indexOfDoc] / worstDocsCount;
+                        }
+                    }
+                }
+
+                List<Tuple<double, string>> tupleQueryList = new List<Tuple<double, string>>();
+                List<string> queryKeywordsList = new List<string>();
+                for (int i = 0; i < newQueryTFnotNormalized.Length; i++)
+                {
+                    if (_queryTFVectorNotNormalized[i] > 0)
+                    {
+                        queryKeywordsList.Add(_keywords[i]);
+                        continue;
+                    }
+                    tupleQueryList.Add(new Tuple<double, string>(newQueryTFnotNormalized[i], _keywords[i]));
+                }
+
+                String newQuery = String.Join(" ", queryKeywordsList.ToArray());
+                allHelpQueries.Add(newQuery + " " + String.Join(" ", tupleQueryList.OrderByDescending(t => t.Item1).Take(5).Select(t => t.Item2).ToArray()));
+                documentPercentageSplit += _queryDocumentsSplitPercentageDelta;
+            }
+            return allHelpQueries;
         }
     }
 }
